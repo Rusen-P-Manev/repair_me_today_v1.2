@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Изтриване на част{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 mt-5">
+        <div class="card kiosk-card text-center p-5 border-danger border-2">
+            <h2 class="fw-bold text-dark">Изтриване на част</h2>
+            <p class="fs-4 mt-3">Сигурни ли сте, че искате да изтриете:<br>
+                <strong class="text-primary fs-3">{{ object.description }}</strong> ?
+            </p>
+            <form method="POST" class="mt-4 d-flex justify-content-between gap-3">
+                {% csrf_token %}
+                <a href="{% url 'repairs:job_detail' object.repair_job.id %}" class="btn btn-light text-dark border fw-bold px-4">Назад</a>
+                <button type="submit" class="btn btn-danger fw-bold px-5">Да, изтрий</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

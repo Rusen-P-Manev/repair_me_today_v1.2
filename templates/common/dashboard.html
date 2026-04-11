@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Работно Табло - RepairMeToday{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <h1 class="display-5 fw-bold text-secondary mb-0">Работно табло</h1>
+    
+    <div class="border border-dark border-2 rounded p-3 bg-light text-dark fw-bold fs-4 shadow-sm" id="datetime-box">
+        <span id="current-date"></span> | <span id="current-time"></span>
+    </div>
+</div>
+
+<div class="card kiosk-card p-4 mb-5 border-top border-primary border-4 shadow-sm">
+    <div class="d-flex flex-column flex-md-row gap-3">
+        <a href="{% url 'garage:client_create' %}" class="btn btn-primary kiosk-btn fw-bold text-white flex-fill fs-4 py-3">Добави клиент</a>
+        <a href="{% url 'garage:vehicle_create' %}" class="btn btn-primary kiosk-btn fw-bold text-white flex-fill fs-4 py-3">Добави автомобил</a>
+        <a href="{% url 'repairs:job_create' %}" class="btn btn-primary kiosk-btn fw-bold text-white flex-fill fs-4 py-3">Нова работна карта</a>
+    </div>
+</div>
+
+<div class="card kiosk-card p-4 mb-5 pb-5 border-top border-secondary border-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0 text-secondary">Текущи ремонти</h3>
+        <a href="{% url 'repairs:job_list' %}" class="btn btn-warning text-dark fs-5 fw-bold shadow-sm px-4">Всички</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle fs-5">
+            <thead class="table-light">
+                <tr>
+                    <th>Автомобил</th>
+                    <th>Клиент</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in recent_jobs %}
+                <tr onclick="window.location='{% url 'repairs:job_detail' job.pk %}'" style="cursor: pointer;" title="Отвори работна карта #{{ job.id }}">
+                    <td>
+                        <strong>{{ job.vehicle.make }} {{ job.vehicle.model }}</strong> <br>
+                        <span class="badge border border-secondary text-secondary bg-transparent mt-1 fs-6">{{ job.vehicle.vehicle_registration_number }}</span>
+                    </td>
+                    <td>
+                        {{ job.vehicle.client.first_name }} {{ job.vehicle.client.last_name }}
+                    </td>
+                    <td>
+                        {% if job.status == 'received' %}
+                            <span class="badge bg-secondary">{{ job.get_status_display }}</span>
+                        {% elif job.status == 'in_progress' %}
+                            <span class="badge bg-primary">{{ job.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-4">Няма активни ремонти в момента.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+
+        const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        document.getElementById('current-date').textContent = now.toLocaleDateString('bg-BG', dateOptions);
+
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        document.getElementById('current-time').textContent = now.toLocaleTimeString('bg-BG', timeOptions);
+    }
+    
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
+{% endblock %}

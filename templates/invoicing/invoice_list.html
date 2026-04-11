@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Издадени Фактури - RepairMeToday{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5 fw-bold text-secondary">Издадени Фактури</h1>
+</div>
+<div class="card kiosk-card p-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle fs-5 mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Фактура №</th>
+                        <th>Клиент (Получател)</th>
+                        <th>ЕИК/ЕГН</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ invoice.invoice_number }}</td>
+                        <td class="fw-semibold">{{ invoice.client_name }}</td>
+                        <td class="text-muted">{{ invoice.tax_id }}</td>
+                        <td class="fw-bold fs-4">{{ invoice.total_amount }} €</td>
+                        <td>
+                            {% if invoice.is_paid %}
+                                <span class="badge bg-success fs-6">Платена</span>
+                            {% else %}
+                                <span class="badge bg-danger fs-6">Чака плащане</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ invoice.created_at|date:"d.m.Y" }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'invoicing:invoice_detail' invoice.pk %}" class="btn btn-primary fw-bold">Отвори</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5"><h4>Няма издадени фактури.</h4></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

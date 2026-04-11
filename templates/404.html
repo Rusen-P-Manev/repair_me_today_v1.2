@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %} {% block title %}Страницата не е намерена (404) - RepairMeToday{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5 pb-5">
+    <div class="col-md-8 text-center">
+        <img src="{% static 'images/404.jpg' %}" alt="404 Page Not Found" class="img-fluid mb-5 rounded shadow" style="max-height: 400px;">
+
+        <h2 class="display-5 fw-bold text-dark mb-4">Страницата не е намерена</h2>
+        <p class="fs-4 text-muted mb-5">
+            Изглежда, че адресът, който се опитвате да отворите, не съществува или е бил преместен. Моля, проверете изписването или се върнете към началния екран.
+        </p>
+        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg fw-bold px-5 py-3 fs-4">
+            Назад към Таблото
+        </a>
+    </div>
+</div>
+{% endblock %}

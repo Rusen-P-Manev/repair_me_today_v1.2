@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Изтриване на автомобил{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 mt-5">
+        <div class="card kiosk-card text-center p-5 border-danger border-2">
+            <h2 class="fw-bold text-dark">Сигурни ли сте?</h2>
+            <p class="fs-4 mt-3">Предстои да изтриете автомобил:<br>
+                <strong class="text-primary fs-3">{{ object.vehicle_registration_number }} - {{ object.make }} {{ object.model }}</strong>
+            </p>
+            <div class="alert alert-warning fs-5">
+                Изтриването на автомобила ще премахне и цялата история на ремонтите му!
+            </div>
+            <form method="POST" class="mt-4 d-flex justify-content-between">
+                {% csrf_token %}
+                <a href="{% url 'garage:vehicle_list' %}" class="btn btn-light text-dark border fw-bold px-4">Върни към списъка</a>
+                <button type="submit" class="btn btn-danger fw-bold px-5">Да, изтрий</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Работни карти - RepairMeToday{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5 fw-bold text-secondary">Работни карти</h1>
+    <a href="{% url 'repairs:job_create' %}" class="btn btn-primary kiosk-btn shadow-sm px-4 fw-bold">Добави Работна карта</a>
+</div>
+<div class="card kiosk-card p-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle fs-5 mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Автомобил</th>
+                        <th>Статус</th>
+                        <th>Приет на</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    <tr>
+                        <td class="fw-semibold">
+                            <span class="badge border border-secondary text-secondary bg-transparent fs-6 me-2">{{ job.vehicle.vehicle_registration_number }}</span>
+                            {{ job.vehicle.make }} {{ job.vehicle.model }}
+                        </td>
+                        <td>
+                            {% if job.status == 'received' %}
+                                <span class="badge bg-secondary fs-6">{{ job.get_status_display }}</span>
+                            {% elif job.status == 'in_progress' %}
+                                <span class="badge bg-primary fs-6">{{ job.get_status_display }}</span>
+                            {% elif job.status == 'completed' %}
+                                <span class="badge bg-success fs-6">{{ job.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ job.created_at|date:"d.m.Y H:i" }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'repairs:job_detail' job.pk %}" class="btn btn-primary fw-bold me-1">Отвори</a>
+                            <a href="{% url 'repairs:job_update' job.pk %}" class="btn btn-success fw-bold me-1">Редактирай</a>
+                            <a href="{% url 'repairs:job_delete' job.pk %}" class="btn btn-danger fw-bold">Изтрий</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-5"><h4>Няма отворени работни карти.</h4></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

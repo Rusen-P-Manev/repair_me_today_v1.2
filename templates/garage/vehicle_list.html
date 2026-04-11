@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Списък Автомобили - RepairMeToday{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5 fw-bold text-secondary">Списък с Автомобили</h1>
+    <a href="{% url 'garage:vehicle_create' %}" class="btn btn-primary fw-bold shadow-sm px-4">Добави Автомобил</a>
+</div>
+<div class="card kiosk-card p-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle fs-5 mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Рег. Номер</th>
+                        <th>Марка / Модел</th>
+                        <th>VIN</th>
+                        <th>Клиент</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vehicle in vehicles %}
+                    <tr>
+                        <td>
+                            <span class="badge border border-secondary text-secondary bg-transparent fs-5">{{ vehicle.vehicle_registration_number }}</span>
+                        </td>
+                        <td class="fw-semibold">{{ vehicle.make }} {{ vehicle.model }} <small class="text-muted">({{ vehicle.year }})</small></td>
+                        <td class="text-muted text-break">{{ vehicle.vin }}</td>
+                        <td><a href="{% url 'garage:client_update' vehicle.client.pk %}" class="text-decoration-none">{{ vehicle.client }}</a></td>
+                        <td class="text-end">
+                            <a href="{% url 'garage:vehicle_update' vehicle.pk %}" class="btn btn-success fw-bold me-2">Редактирай</a>
+                            <a href="{% url 'garage:vehicle_delete' vehicle.pk %}" class="btn btn-danger fw-bold">Изтрий</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5"><h4>Няма регистрирани автомобили.</h4></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

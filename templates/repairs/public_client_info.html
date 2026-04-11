@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Проверка на статус - RepairMeToday{% endblock %}
+{% block content %}
+<div class="row justify-content-center mb-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold text-primary">Проверка на статус</h1>
+            <p class="fs-5 text-muted">Въведете вашия уникален код за достъп и регистрационен номер, за да проверите докъде е стигнал ремонтът на вашия автомобил.</p>
+        </div>
+        <div class="card shadow-sm p-4 border-primary border-top border-4">
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                    {% for field in form %}
+                        <div class="col-12 mb-2">
+                            <label class="form-label fw-bold fs-5">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger mt-1 small fw-bold">{% for error in field.errors %}* {{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary w-100 fs-4 fw-bold py-3">Провери Статус</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if job %}
+<div class="row justify-content-center pb-5" id="result-section">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+            <div class="bg-dark text-white p-4 text-center">
+                <h2 class="mb-0">{{ job.vehicle.make }} {{ job.vehicle.model }}</h2>
+                <div class="badge bg-warning text-dark fs-5 mt-2 border border-dark">{{ job.vehicle.vehicle_registration_number }}</div>
+            </div>
+            <div class="card-body p-5">
+                <div class="row text-center mb-4">
+                    <div class="col-12">
+                        <h4 class="text-muted text-uppercase mb-2">Текущ Статус на ремонта</h4>
+                        {% if job.status == 'received' %}
+                            <h1 class="display-6 fw-bold text-secondary border border-secondary p-3 rounded d-inline-block">{{ job.get_status_display }}</h1>
+                        {% elif job.status == 'in_progress' %}
+                            <h1 class="display-6 fw-bold text-primary border border-primary p-3 rounded d-inline-block">В сервиза / {{ job.get_status_display }}</h1>
+                        {% elif job.status == 'waiting_parts' %}
+                            <h1 class="display-6 fw-bold text-danger border border-danger p-3 rounded d-inline-block">{{ job.get_status_display }}</h1>
+                        {% elif job.status == 'completed' %}
+                            <h1 class="display-6 fw-bold text-success border border-success p-3 rounded d-inline-block">Готов за получаване</h1>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr class="my-4">
+                <div class="row text-center">
+                    <div class="col-12">
+                        <h4 class="text-muted text-uppercase mb-3">Финансова информация</h4>
+                        {% if job.invoice %}
+                            <h2 class="fw-bold mb-3">Дължима сума: <span class="text-dark">{{ job.invoice.total_amount }} €</span></h2>
+                            {% if job.invoice.is_paid %}
+                                <div class="alert alert-success fs-5 fw-bold">Тази сума е платена. Благодарим ви!</div>
+                            {% else %}
+                                <div class="alert alert-warning fs-5">Сумата очаква плащане при получаване на автомобила.</div>
+                            {% endif %}
+                        {% else %}
+                            <p class="fs-5 text-muted"><em>Крайната сума ще бъде изчислена след приключване на ремонта.</em></p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="text-center mt-5">
+                    <p class="text-muted small">При въпроси, моля свържете се с нас на рецепция.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var resultSection = document.getElementById('result-section');
+        if (resultSection) { resultSection.scrollIntoView({ behavior: 'smooth' }); }
+    });
+</script>
+{% endif %}
+{% endblock %}

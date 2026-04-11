@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Изтриване на услуга{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 mt-5">
+        <div class="card kiosk-card text-center p-5 border-danger border-2">
+            <h1 class="display-1 text-danger mb-3"></h1>
+            <h2 class="fw-bold text-dark">Изтриване на услуга</h2>
+
+            <p class="fs-4 mt-3">
+                Сигурни ли сте, че искате да изтриете от каталога:<br>
+                <strong class="text-primary fs-3">{{ object.name }}</strong>
+            </p>
+
+            <div class="alert alert-warning fs-5">
+                Забележка: Това няма да изтрие услугата от вече приключени работни карти, но тя няма да е налична за нови ремонти.
+            </div>
+
+            <form method="POST" class="mt-4 d-flex justify-content-center gap-3">
+                {% csrf_token %}
+                <a href="{% url 'repairs:service_catalog_list' %}" class="btn btn-secondary kiosk-btn">Отказ</a>
+                <button type="submit" class="btn btn-danger kiosk-btn fw-bold">Да, Изтрий</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Архив - RepairMeToday{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5 fw-bold text-secondary">Архив на приключени ремонти</h1>
+</div>
+
+<div class="card kiosk-card p-3 border-secondary border-top border-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle fs-5 mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="w-50">Архивен запис</th>
+                        <th>Данни</th>
+                        <th class="text-end">Опции</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for archive in archives %}
+                    <tr>
+                        <td class="fw-bold text-dark align-top pt-4 fs-4">
+                            ф. #{{ archive.archive_data.invoice_info.invoice_number }}: {{ archive.archive_data.client_info.name }}
+                        </td>
+                        <td class="pt-3 pb-3">
+                            <details>
+                                <summary class="btn btn-secondary fw-bold mb-2">Покажи JSON данни</summary>
+                                <pre class="bg-dark text-success p-3 rounded fs-6 shadow-sm border border-secondary" style="max-height: 400px; overflow-y: auto;">{{ archive.archive_data|pprint }}</pre>
+                            </details>
+                        </td>
+                        <td class="text-end align-top pt-3">
+                            <a href="{% url 'repairs:archived_invoice' archive.id %}" class="btn btn-info text-white fw-bold">Преглед на фактура</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-5">
+                            <h4>Архивът е празен.</h4>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

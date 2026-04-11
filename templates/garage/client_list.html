@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Списък Клиенти - RepairMeToday{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5 fw-bold text-secondary">Списък с Клиенти</h1>
+    <a href="{% url 'garage:client_create' %}" class="btn btn-primary fw-bold shadow-sm px-4">Добави Клиент</a>
+</div>
+<div class="card kiosk-card p-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle fs-5 mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Име / МОЛ</th>
+                        <th>Фирма / ЕИК</th>
+                        <th>Телефон</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td class="fw-semibold">{{ client.first_name }} {{ client.last_name }}</td>
+                        <td>
+                            {% if client.is_corporate %}
+                                <span class="badge bg-info text-dark fs-6">{{ client.company_name }}</span><br>
+                                <small class="text-muted">ЕИК: {{ client.tax_id }}</small>
+                            {% else %}
+                                <span class="badge bg-secondary">Физическо лице</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ client.phone_number|format_phone }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'garage:client_update' client.pk %}" class="btn btn-success fw-bold me-2">Редактирай</a>
+                            <a href="{% url 'garage:client_delete' client.pk %}" class="btn btn-danger fw-bold">Изтрий</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-5"><h4>Няма намерени клиенти.</h4></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Фактура №{{ invoice.invoice_number }} - RepairMeToday{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between mb-3 d-print-none">
+            <a href="{% url 'invoicing:invoice_list' %}" class="btn btn-light text-dark border fw-bold px-4">Върни към списъка</a>
+            <div>
+                {% if not invoice.is_paid %}
+                <form method="POST" action="{% url 'invoicing:invoice_mark_paid' invoice.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success fw-bold px-4 me-2">Маркирай като ПЛАТЕНА</button>
+                </form>
+                {% endif %}
+                <button onclick="window.print()" class="btn btn-outline-secondary fw-bold px-4">Отпечатай</button>
+            </div>
+        </div>
+        <div class="card shadow-sm border-0 mb-4 kiosk-card">
+            <div class="card-body p-5">
+                <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-4">
+                    <h1 class="display-5 fw-bold text-dark mb-0">ФАКТУРА</h1>
+                    <div class="text-end">
+                        <h3 class="fw-bold text-primary mb-1">№ {{ invoice.invoice_number }}</h3>
+                        <p class="text-muted fs-5 mb-0">Дата: {{ invoice.created_at|date:"d.m.Y" }}</p>
+                        <span class="badge {% if invoice.is_paid %}bg-success{% else %}bg-warning text-dark{% endif %} fs-5 mt-2">
+                            {% if invoice.is_paid %}ПЛАТЕНА{% else %}НЕПЛАТЕНА{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="row mb-5 fs-5">
+                    <div class="col-sm-6">
+                        <h5 class="fw-bold text-secondary text-uppercase mb-3">Издател (Доставчик):</h5>
+                        {% if shop_profile %}
+                            <p class="mb-1 fw-bold fs-4">{{ shop_profile.name|default:"-" }}</p>
+                            <p class="mb-1"><strong>ЕИК:</strong> {{ shop_profile.eik|default:"-" }}</p>
+                            <p class="mb-1"><strong>ДДС №:</strong> {{ shop_profile.vat_number|default:"-" }}</p>
+                            <p class="mb-1"><strong>Адрес:</strong> {{ shop_profile.address|default:"-" }}</p>
+                            <p class="mb-0"><strong>IBAN:</strong> {{ shop_profile.iban|default:"-" }}</p>
+                        {% else %}
+                            <p class="text-danger"><em>Данните на сервиза не са въведени в Admin панела.</em></p>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-6 text-sm-end mt-4 mt-sm-0">
+                        <h5 class="fw-bold text-secondary text-uppercase mb-3">Получател (Клиент):</h5>
+                        <p class="mb-1 fw-bold fs-4">{{ invoice.client_name }}</p>
+                        {% if invoice.tax_id %}
+                            <p class="mb-1"><strong>ЕИК / ЕГН:</strong> {{ invoice.tax_id }}</p>
+                        {% endif %}
+                        <p class="mb-1 text-muted mt-3">Ремонт по Работна карта: <strong>#{{ invoice.repair_job.id }}</strong></p>
+                        <p class="mb-1 text-muted">Автомобил: <span class="badge border border-secondary text-secondary bg-transparent fs-6">{{ invoice.repair_job.vehicle.vehicle_registration_number }}</span></p>
+                    </div>
+                </div>
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-striped align-middle fs-5">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Описание (Части и Услуги)</th>
+                                <th class="text-center">Кол.</th>
+                                <th class="text-end">Ед. цена</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rs in invoice.repair_job.repairservice_set.all %}
+                            <tr>
+                                <td>Услуга: {{ rs.service.name }}</td>
+                                <td class="text-center">{{ rs.quantity }}</td>
+                                <td class="text-end">{{ rs.service.price }} €</td>
+                            </tr>
+                            {% endfor %}
+                            {% for part in invoice.repair_job.parts.all %}
+                            <tr>
+                                <td>Част: {{ part.description }}</td>
+                                <td class="text-center">1</td>
+                                <td class="text-end">{{ part.price|default:"0.00" }} €</td>
+                            </tr>
+                            {% endfor %}
+                            {% if not invoice.repair_job.parts.all and not invoice.repair_job.repairservice_set.all %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">В ремонта няма вложени части или услуги.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row justify-content-end mb-4">
+                    <div class="col-sm-6 col-md-5">
+                        <table class="table table-borderless table-sm fs-5">
+                            <tr>
+                                <td class="text-end fw-semibold text-muted">Данъчна основа:</td>
+                                <td class="text-end">{{ subtotal }} €</td>
+                            </tr>
+                            <tr class="border-bottom border-dark">
+                                <td class="text-end fw-semibold text-muted">ДДС (20%):</td>
+                                <td class="text-end">{{ vat }} €</td>
+                            </tr>
+                            <tr>
+                                <td class="text-end fw-bold fs-4 pt-3">ОБЩА СУМА:</td>
+                                <td class="text-end fw-bold fs-3 text-success pt-3">{{ invoice.total_amount }} €</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-start mt-5 d-print-none border-top pt-4">
+                    <a href="{% url 'repairs:job_detail' invoice.repair_job.id %}" class="btn btn-light text-dark border fw-bold px-4 mb-3">Назад</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+@media print {
+    body { background-color: white; }
+    .kiosk-card { box-shadow: none !important; border: none !important; }
+}
+</style>
+{% endblock %}
