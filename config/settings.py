@@ -41,6 +41,7 @@ PROJECT_APPS = [
     'invoicing',
     'repairs',
     'common',
+    'accounts',
 ]
 
 INSTALLED_APPS = [
@@ -137,3 +138,4 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
+AUTH_USER_MODEL = 'accounts.CarServiceUsers'
