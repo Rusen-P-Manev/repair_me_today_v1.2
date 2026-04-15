@@ -10,10 +10,12 @@ urlpatterns = [
     path('jobs/<int:pk>/', views.ViewRepairJobDetail.as_view(), name='job_detail'),
     path('jobs/<int:pk>/edit/', views.ViewRepairJobUpdate.as_view(), name='job_update'),
     path('jobs/<int:pk>/delete/', views.ViewRepairJobDelete.as_view(), name='job_delete'),
+    path('jobs/<int:pk>/update-status/', views.ViewRepairJobStatusUpdate.as_view(), name='job_status_update'),
 
 # parts
     path('jobs/<int:job_id>/parts/add/', views.ViewPartOrderCreate.as_view(), name='part_create'),
     path('parts/<int:pk>/delete/', views.ViewPartOrderDelete.as_view(), name='part_delete'),
+    path('parts/<int:pk>/update/', views.ViewPartOrderUpdate.as_view(), name='part_update'),
 
 # parts and services
     path('jobs/<int:job_id>/parts/add/', views.ViewPartOrderCreate.as_view(), name='part_create'),

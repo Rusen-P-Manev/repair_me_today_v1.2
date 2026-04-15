@@ -4,7 +4,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.views import View
 from invoicing.models import ShopProfile
-from common.utils import calculate_vat
+from common.utils import calculate_vat, check_if_ready_for_invoicing
 from .models import (
     RepairJob, PartOrder, Service,
     RepairArchive, RepairService
@@ -14,7 +14,8 @@ from .forms import (
     PublicClientInfoForm, ServiceCatalogForm, RepairServiceForm
 )
 
- # repairs -->
+
+# repairs -->
 class ViewRepairJobList(ListView):
     model = RepairJob
     template_name = 'repairs/job_list.html'
@@ -26,6 +27,12 @@ class ViewRepairJobDetail(DetailView):
     model = RepairJob
     template_name = 'repairs/job_detail.html'
     context_object_name = 'job'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_ready_for_invoicing'] = check_if_ready_for_invoicing(self.object)
+        context['status_choices'] = RepairJob._meta.get_field('status').choices
+        return context
 
 
 class ViewRepairJobCreate(CreateView):
@@ -99,6 +106,37 @@ class ViewPartOrderDelete(DeleteView):
         messages.warning(self.request, "Частта беше премахната от списъка.")
         return super().form_valid(form)
 
+
+class ViewPartOrderUpdate(UpdateView):
+    model = PartOrder
+    form_class = PartOrderForm
+
+    template_name = 'repairs/add_part_form.html'
+
+    def form_valid(self, form):
+        messages.success(self.request, "Данните са обновени успешно!")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('repairs:job_detail', kwargs={'pk': self.object.repair_job.pk})
+
+
+class ViewRepairJobStatusUpdate(View):
+
+    def post(self, request, pk):
+        job = get_object_or_404(RepairJob, pk=pk)
+
+        if hasattr(job, 'invoice'):
+            messages.error(request, "Не можете да променяте статуса на вече фактуриран ремонт!")
+            return redirect('repairs:job_detail', pk=job.pk)
+
+        new_status = request.POST.get('status')
+        if new_status:
+            job.status = new_status
+            job.save()
+            messages.success(request, f"Статусът беше успешно променен на: {job.get_status_display()}")
+
+        return redirect('repairs:job_detail', pk=job.pk)
 
 # public client info --?
 class ViewClientInfo(View):
@@ -230,3 +268,4 @@ class ViewArchivedInvoiceDetail(DetailView):
         context['total_amount'] = total_amount
 
         return context
+

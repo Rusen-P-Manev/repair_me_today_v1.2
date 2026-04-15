@@ -1,47 +1,91 @@
 {% extends 'base.html' %}
 {% block title %}Работна карта {{ job.id }} - RepairMeToday{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="display-5 fw-bold text-secondary">Работна карта</h1>
     <div>
         <a href="{% url 'repairs:job_list' %}" class="btn btn-light text-dark border fw-bold shadow-sm me-2">Върни към списъка</a>
+        {% if not job.invoice %}
         <a href="{% url 'repairs:job_update' job.pk %}" class="btn btn-success fw-bold shadow-sm">Редактирай</a>
+        {% endif %}
     </div>
 </div>
+
 <div class="row g-4">
-    <div class="col-lg-5">
-        <div class="card kiosk-card p-4 h-100 border-primary border-top border-4">
-            <h3 class="fw-bold mb-4">Данни за автомобила</h3>
-            <p class="fs-5 mb-2"><span class="text-muted">Рег. Номер:</span> <span class="badge border border-secondary text-secondary bg-transparent fs-5">{{ job.vehicle.vehicle_registration_number }}</span></p>
-            <p class="fs-5 mb-2"><span class="text-muted">Марка / Модел:</span> <strong>{{ job.vehicle.make }} {{ job.vehicle.model }}</strong></p>
-            <p class="fs-5 mb-2"><span class="text-muted">Клиент:</span> {{ job.vehicle.client }}</p>
-            <hr>
-            <p class="fs-5 mb-2"><span class="text-muted">Текущ статус:</span> <strong>{{ job.get_status_display }}</strong></p>
-            <p class="fs-5 mb-2"><span class="text-muted">Приел автомобила:</span> {{ job.received_by|default:"-" }}</p>
-            <p class="fs-5 mb-2"><span class="text-muted">Извършил ремонта:</span> {{ job.repaired_by|default:"-" }}</p>
-            <p class="fs-6 mt-3 mb-0"><span class="text-muted">Код за достъп (клиенти):</span> <span class="font-monospace">{{ job.access_token }}</span></p>
-            <div class="mt-4 p-3 bg-light rounded border">
-                <h5 class="fw-bold text-danger">Оплаквания / Проблем:</h5>
-                <p class="mb-0 fs-5">{{ job.problem_description|linebreaksbr }}</p>
+    <div class="col-12">
+        <div class="card kiosk-card p-4 border-primary border-top border-4 shadow-sm">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="fw-bold mb-4">Данни за автомобила</h3>
+                    <p class="fs-5 mb-2">
+                        <span class="text-muted">Рег. Номер:</span>
+                        <span class="badge border border-secondary text-secondary bg-transparent fs-5">{{ job.vehicle.vehicle_registration_number }}</span>
+                    </p>
+                    <p class="fs-5 mb-2"><span class="text-muted">Марка / Модел:</span> <strong>{{ job.vehicle.make }} {{ job.vehicle.model }}</strong></p>
+                    <p class="fs-5 mb-2"><span class="text-muted">Клиент:</span> {{ job.vehicle.client }}</p>
+
+                    <p class="fs-6 mt-3 mb-0">
+                        <span class="text-muted">Код за достъп:</span>
+                        <span class="font-monospace">{{ job.access_token }}</span>
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="bg-light p-3 rounded border mb-3">
+                        <label class="text-muted fs-6 mb-1 fw-bold">Текущ статус на ремонта:</label>
+                        <form method="POST" action="{% url 'repairs:job_status_update' job.id %}" class="d-flex gap-2">
+                            {% csrf_token %}
+                            <select name="status" class="form-select form-select-lg fw-bold w-auto {% if job.invoice %}bg-secondary text-white opacity-50{% endif %}" {% if job.invoice %}disabled{% endif %}>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if job.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if not job.invoice %}
+                                <button type="submit" class="btn btn-primary fw-bold px-4">Обнови</button>
+                            {% endif %}
+                        </form>
+                    </div>
+
+                    <p class="fs-5 mb-1"><span class="text-muted">Приел:</span> {{ job.received_by|default:"-" }}</p>
+                    <p class="fs-5 mb-0"><span class="text-muted">Извършил:</span> {{ job.repaired_by|default:"-" }}</p>
+                </div>
             </div>
-            <div class="mt-4">
-                {% if not job.invoice %}
-                    <a href="{% url 'invoicing:invoice_create' job.id %}" class="btn btn-warning kiosk-btn w-100 fw-bold fs-4">Издай Фактура</a>
-                {% else %}
-                    <a href="{% url 'invoicing:invoice_detail' job.invoice.id %}" class="btn btn-info text-white kiosk-btn w-100 fw-bold fs-4">Преглед на Фактура {{ job.invoice.invoice_number }}</a>
-                {% endif %}
+
+            <hr class="my-4">
+
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="fw-bold text-danger mb-2">Оплаквания / Проблем:</h5>
+                    <p class="mb-0 fs-5">{{ job.problem_description|linebreaksbr }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    {% if not job.invoice %}
+                        {% if is_ready_for_invoicing %}
+                            <a href="{% url 'invoicing:invoice_create' job.id %}" class="btn btn-warning kiosk-btn fw-bold fs-4 text-dark w-100">Издай Фактура</a>
+                        {% else %}
+                            <button class="btn btn-secondary kiosk-btn fw-bold fs-5 disabled w-100" style="opacity: 0.6;">Издай Фактура (Заключено)</button>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'invoicing:invoice_detail' job.invoice.id %}" class="btn btn-info text-white kiosk-btn fw-bold fs-4 w-100">Фактура {{ job.invoice.invoice_number }}</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-7">
-        <div class="card kiosk-card p-4 h-100 border-dark border-top border-4">
+
+    <div class="col-12">
+        <div class="card kiosk-card p-4 border-dark border-top border-4 shadow-sm">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="fw-bold mb-0">Части / Услуги</h3>
                 <div>
+                    {% if not job.invoice %}
                     <a href="{% url 'repairs:part_create' job.id %}" class="btn btn-primary fs-5 fw-bold px-3 rounded-pill me-2">Добави част</a>
                     <a href="{% url 'repairs:service_create' job.id %}" class="btn btn-primary fs-5 fw-bold px-3 rounded-pill">Добави услуга</a>
+                    {% endif %}
                 </div>
             </div>
+
             <div class="table-responsive">
                 <table class="table table-hover align-middle fs-5">
                     <thead class="table-light">
@@ -49,7 +93,9 @@
                             <th>Описание</th>
                             <th>Статус / Кол.</th>
                             <th>Цена</th>
+                            {% if not job.invoice %}
                             <th class="text-end">Опции</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -58,24 +104,39 @@
                             <td class="fw-semibold">Услуга: {{ rs.service.name }}</td>
                             <td>{{ rs.quantity }} бр./ч.</td>
                             <td>{{ rs.service.price }} €</td>
-                            <td class="text-end"><a href="{% url 'repairs:service_delete' rs.id %}" class="btn btn-sm btn-danger fw-bold">Изтрий</a></td>
+                            {% if not job.invoice %}
+                            <td class="text-end">
+                                <a href="{% url 'repairs:service_delete' rs.id %}" class="btn btn-sm btn-danger fw-bold">Изтрий</a>
+                            </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
+
                         {% for part in job.parts.all %}
                         <tr>
                             <td class="fw-semibold">Част: {{ part.description }}</td>
                             <td>
-                                {% if part.status == 'for_order' %}<span class="badge bg-danger">За поръчка</span>
-                                {% elif part.status == 'ordered' %}<span class="badge bg-warning text-dark">Поръчана</span>
-                                {% elif part.status == 'delivered' %}<span class="badge bg-success">Доставена</span>{% endif %}
+                                {% if part.status == 'for_order' %}
+                                    <span class="badge bg-danger">За поръчка</span>
+                                {% elif part.status == 'ordered' %}
+                                    <span class="badge bg-warning text-dark">Поръчана</span>
+                                {% elif part.status == 'delivered' %}
+                                    <span class="badge bg-success">Доставена</span>
+                                {% endif %}
                             </td>
                             <td>{% if part.price %}{{ part.price }} €{% else %}-{% endif %}</td>
-                            <td class="text-end"><a href="{% url 'repairs:part_delete' part.id %}" class="btn btn-sm btn-danger fw-bold">Изтрий</a></td>
+                            {% if not job.invoice %}
+                            <td class="text-end">
+                                <a href="{% url 'repairs:part_update' part.id %}" class="btn btn-sm btn-warning fw-bold text-dark me-1">Редактирай</a>
+                                <a href="{% url 'repairs:part_delete' part.id %}" class="btn btn-sm btn-danger fw-bold">Изтрий</a>
+                            </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
+
                         {% if not job.parts.all and not job.repairservice_set.all %}
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-4"><em>Все още няма добавени части/услуги към този ремонт.</em></td>
+                            <td colspan="{% if job.invoice %}3{% else %}4{% endif %}" class="text-center text-muted py-4"><em>Все още няма добавени части/услуги към този ремонт.</em></td>
                         </tr>
                         {% endif %}
                     </tbody>

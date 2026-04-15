@@ -56,8 +56,9 @@ class Invoice(models.Model):
     )
 
     invoice_number = models.CharField(
-        max_length=10,
+        max_length=20,
         unique=True,
+        blank=True,
         verbose_name="Фактура №",
     )
 
@@ -93,6 +94,23 @@ class Invoice(models.Model):
         auto_now_add=True,
         verbose_name="Създадена на",
     )
+
+    @classmethod
+    def _generate_invoice_number(cls):
+        last_invoice = cls.objects.order_by('-id').first()
+
+        if last_invoice and last_invoice.invoice_number.startswith('INV-'):
+            last_num = int(last_invoice.invoice_number.split('-')[1])
+            return f"INV-{last_num + 1:06d}"
+
+        return 'INV-000001'
+
+    def save(self, *args, **kwargs):
+        if not self.invoice_number:
+            self.invoice_number = self._generate_invoice_number()
+
+        super().save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = "Фактура"

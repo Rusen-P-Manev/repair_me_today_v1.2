@@ -63,3 +63,18 @@ def create_repair_archive(job):
         vehicle_registration_number=job.vehicle.vehicle_registration_number,
         archive_data=json_payload
     )
+
+
+def check_if_ready_for_invoicing(job):
+    from repairs.models import RepairStatusChoices, PartOrderStatusChoices
+
+    if job.status != RepairStatusChoices.COMPLETED:
+        return False
+
+    for part in job.parts.all():
+        if part.status != PartOrderStatusChoices.DELIVERED or not part.price:
+            return False
+
+    if not job.parts.exists() and not job.repairservice_set.exists():
+        return False
+    return True

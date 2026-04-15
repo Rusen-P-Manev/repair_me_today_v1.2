@@ -8,7 +8,7 @@ from repairs.models import RepairJob
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, DetailView
-from common.utils import create_repair_archive, calculate_vat
+from common.utils import create_repair_archive, calculate_vat, check_if_ready_for_invoicing
 
 
 class ViewInvoiceList(ListView):
@@ -22,6 +22,27 @@ class ViewInvoiceCreate(CreateView):
     model = Invoice
     form_class = InvoiceForm
     template_name = 'invoicing/invoice_form.html'
+
+    @staticmethod
+    def _validate_invoicing_requisites(job):
+        if hasattr(job, 'invoice'):
+            return True, "Вече има издадена фактура!"
+
+        if not check_if_ready_for_invoicing(job):
+            return True, "Ремонтът не може да бъде фактуриран!"
+        return False, ""
+
+    def dispatch(self, request, *args, **kwargs):
+        job_id = self.kwargs.get('job_id')
+        job = get_object_or_404(RepairJob, pk=job_id)
+
+        has_error, error_msg = self._validate_invoicing_requisites(job)
+
+        if has_error:
+            messages.error(self.request, error_msg)
+            return redirect('repairs:job_detail', pk=job.id)
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -47,7 +68,6 @@ class ViewInvoiceCreate(CreateView):
                 total += part.price
 
         total_with_vat = total * Decimal('1.20')
-
         initial['total_amount'] = round(total_with_vat, 2)
 
         return initial
@@ -55,10 +75,6 @@ class ViewInvoiceCreate(CreateView):
     def form_valid(self, form):
         job_id = self.kwargs.get('job_id')
         job = get_object_or_404(RepairJob, pk=job_id)
-
-        if hasattr(job, 'invoice'):
-            messages.error(self.request, "За този картон вече има издадена фактура!")
-            return redirect('repairs:job_detail', pk=job.id)
 
         form.instance.repair_job = job
 
@@ -93,6 +109,7 @@ class ViewInvoiceDetail(DetailView):
         context['vat'] = vat_data['vat']
 
         return context
+
 
 class ViewInvoiceMarkPaid(View):
 
