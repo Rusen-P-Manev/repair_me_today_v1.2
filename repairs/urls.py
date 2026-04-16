@@ -16,11 +16,6 @@ urlpatterns = [
     path('jobs/<int:job_id>/parts/add/', views.ViewPartOrderCreate.as_view(), name='part_create'),
     path('parts/<int:pk>/delete/', views.ViewPartOrderDelete.as_view(), name='part_delete'),
     path('parts/<int:pk>/update/', views.ViewPartOrderUpdate.as_view(), name='part_update'),
-
-# parts and services
-    path('jobs/<int:job_id>/parts/add/', views.ViewPartOrderCreate.as_view(), name='part_create'),
-    path('parts/<int:pk>/delete/', views.ViewPartOrderDelete.as_view(), name='part_delete'),
-
     path('jobs/<int:job_id>/services/add/', views.ViewRepairServiceCreate.as_view(), name='service_create'),
     path('services/<int:pk>/delete/', views.ViewRepairServiceDelete.as_view(), name='service_delete'),
 

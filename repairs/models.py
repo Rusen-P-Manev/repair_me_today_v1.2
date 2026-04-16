@@ -179,7 +179,6 @@ class PartOrder(models.Model):
 
 
 class RepairArchive(models.Model):
-
     original_job_id = models.IntegerField(
         verbose_name="ID на оригиналния картон"
     )

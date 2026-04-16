@@ -97,18 +97,21 @@ class Invoice(models.Model):
 
     @classmethod
     def _generate_invoice_number(cls):
-        last_invoice = cls.objects.order_by('-id').first()
+        invoices = cls.objects.filter(invoice_number__startswith='INV-')
 
-        if last_invoice and last_invoice.invoice_number.startswith('INV-'):
-            last_num = int(last_invoice.invoice_number.split('-')[1])
-            return f"INV-{last_num + 1:06d}"
-
-        return 'INV-000001'
+        max_num = 0
+        for inv in invoices:
+            try:
+                current_num = int(inv.invoice_number.split('-')[1])
+                if current_num > max_num:
+                    max_num = current_num
+            except (IndexError, ValueError):
+                continue
+        return f"INV-{max_num + 1:06d}"
 
     def save(self, *args, **kwargs):
-        if not self.invoice_number:
+        if not self.pk:
             self.invoice_number = self._generate_invoice_number()
-
         super().save(*args, **kwargs)
 
 
