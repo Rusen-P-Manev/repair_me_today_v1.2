@@ -1,6 +1,8 @@
 import uuid
 from django.core.validators import MinValueValidator
 from django.db import models
+from common.models import TimeStampModel
+from common.mixins import ReadOnlyModelMixin
 
 
 class PartOrderStatusChoices(models.TextChoices):
@@ -36,7 +38,7 @@ class Service(models.Model):
         return f"{self.name} - {self.price} €."
 
 
-class RepairJob(models.Model):
+class RepairJob(TimeStampModel):  # Наследява времевите полета
     vehicle = models.ForeignKey(
         "garage.Vehicle",
         on_delete=models.CASCADE,
@@ -85,16 +87,6 @@ class RepairJob(models.Model):
         editable=False,
         unique=True,
         verbose_name="Код за проследяване",
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Създаден на",
-    )
-
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name="Последна промяна",
     )
 
     class Meta:
@@ -178,7 +170,7 @@ class PartOrder(models.Model):
         return f"{self.description} - {self.get_status_display()}"
 
 
-class RepairArchive(models.Model):
+class RepairArchive(ReadOnlyModelMixin, TimeStampModel):  # Напълно заключен + време
     original_job_id = models.IntegerField(
         verbose_name="ID на оригиналния картон"
     )
@@ -190,11 +182,6 @@ class RepairArchive(models.Model):
 
     archive_data = models.JSONField(
         verbose_name="JSON Архив на ремонта"
-    )
-
-    archived_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Дата на архивиране"
     )
 
     class Meta:

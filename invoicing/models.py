@@ -3,6 +3,8 @@ from common.validators import (
     validate_eik, validate_tax_id,
     validate_iban, validate_vat_number,
 )
+from common.models import TimeStampModel
+from common.mixins import ReadOnlyFieldsModelMixin
 
 
 class ShopProfile(models.Model):
@@ -47,7 +49,12 @@ class ShopProfile(models.Model):
         return self.name
 
 
-class Invoice(models.Model):
+class Invoice(ReadOnlyFieldsModelMixin, TimeStampModel):
+    readonly_fields = [
+        'invoice_number', 'total_amount', 'client_name',
+        'tax_id', 'is_corporate', 'repair_job'
+    ]
+
     repair_job = models.OneToOneField(
         "repairs.RepairJob",
         on_delete=models.CASCADE,
@@ -88,11 +95,6 @@ class Invoice(models.Model):
     is_paid = models.BooleanField(
         default=False,
         verbose_name="Платена",
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Създадена на",
     )
 
     @classmethod
