@@ -16,4 +16,7 @@ urlpatterns = [
 
 # clients info path
     path('clientinfo/', ViewClientInfo.as_view(), name='public_client_info'),
+
+# accounts
+    path('accounts/', include('accounts.urls')),
 ]

@@ -50,3 +50,21 @@
     border-bottom-width: 1px;
     border-bottom-color: #f0f0f0;
 }
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.form-group input:focus {
+    border-color: var(--primary-color);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.btn-block {
+    width: 100%;
+}

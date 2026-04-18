@@ -8,6 +8,8 @@ class EmployeeAdmin(admin.ModelAdmin):
         "first_name",
         "last_name",
         "position",
+        "phone_number",
+        "user",
     )
 
     list_filter = (
@@ -18,3 +20,9 @@ class EmployeeAdmin(admin.ModelAdmin):
         "first_name",
         "last_name",
     )
+
+    filter_horizontal = (
+        "qualifications",
+    )
+
+    

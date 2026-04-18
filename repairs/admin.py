@@ -1,9 +1,14 @@
 from django.contrib import admin
-from .models import RepairJob, Service, RepairService
+from .models import RepairJob, Service, RepairService, PartOrder
 
 
 class RepairServiceInline(admin.TabularInline):
     model = RepairService
+    extra = 1
+
+
+class PartOrderInline(admin.TabularInline):
+    model = PartOrder
     extra = 1
 
 
@@ -26,6 +31,7 @@ class RepairJobAdmin(admin.ModelAdmin):
 
     inlines = (
         RepairServiceInline,
+        PartOrderInline,
     )
 
     readonly_fields = (
