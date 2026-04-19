@@ -1,18 +1,21 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
 from .models import Client, Vehicle
 from .forms import ClientForm, VehicleForm
+from accounts.mixins import MechanicRequiredMixin, ManagerRequiredMixin
+
 
 # clients -->
-class ViewClientList(ListView):
+class ViewClientList(MechanicRequiredMixin, ListView):
     model = Client
     template_name = 'garage/client_list.html'
     context_object_name = 'clients'
     ordering = ['-id']
 
-class ViewClientCreate(CreateView):
+
+class ViewClientCreate(MechanicRequiredMixin, CreateView):
     model = Client
     form_class = ClientForm
     template_name = 'garage/client_form.html'
@@ -25,7 +28,8 @@ class ViewClientCreate(CreateView):
             return redirect(f"{reverse('garage:vehicle_create')}?client_id={self.object.id}")
         return response
 
-class ViewClientUpdate(UpdateView):
+
+class ViewClientUpdate(MechanicRequiredMixin, UpdateView):
     model = Client
     form_class = ClientForm
     template_name = 'garage/client_form.html'
@@ -38,7 +42,8 @@ class ViewClientUpdate(UpdateView):
             return redirect(f"{reverse('garage:vehicle_create')}?client_id={self.object.id}")
         return response
 
-class ViewClientDelete(DeleteView):
+
+class ViewClientDelete(ManagerRequiredMixin, DeleteView):
     model = Client
     template_name = 'garage/client_delete_confirmation.html'
     success_url = reverse_lazy('garage:client_list')
@@ -49,13 +54,14 @@ class ViewClientDelete(DeleteView):
 
 
 # vehicles -->
-class ViewVehicleList(ListView):
+class ViewVehicleList(MechanicRequiredMixin, ListView):
     model = Vehicle
     template_name = 'garage/vehicle_list.html'
     context_object_name = 'vehicles'
     ordering = ['-id']
 
-class ViewVehicleCreate(CreateView):
+
+class ViewVehicleCreate(MechanicRequiredMixin, CreateView):
     model = Vehicle
     form_class = VehicleForm
     template_name = 'garage/vehicle_form.html'
@@ -75,7 +81,8 @@ class ViewVehicleCreate(CreateView):
             return redirect(f"{reverse('garage:vehicle_create')}?client_id={self.object.client.id}")
         return response
 
-class ViewVehicleUpdate(UpdateView):
+
+class ViewVehicleUpdate(MechanicRequiredMixin, UpdateView):
     model = Vehicle
     form_class = VehicleForm
     template_name = 'garage/vehicle_form.html'
@@ -88,7 +95,8 @@ class ViewVehicleUpdate(UpdateView):
             return redirect(f"{reverse('garage:vehicle_create')}?client_id={self.object.client.id}")
         return response
 
-class ViewVehicleDelete(DeleteView):
+
+class ViewVehicleDelete(ManagerRequiredMixin, DeleteView):
     model = Vehicle
     template_name = 'garage/vehicle_delete_confirmation.html'
     success_url = reverse_lazy('garage:vehicle_list')

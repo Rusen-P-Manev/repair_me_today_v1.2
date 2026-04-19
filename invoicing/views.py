@@ -9,16 +9,17 @@ from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, DetailView
 from common.utils import create_repair_archive, calculate_vat, check_if_ready_for_invoicing
+from accounts.mixins import ManagerRequiredMixin
 
 
-class ViewInvoiceList(ListView):
+class ViewInvoiceList(ManagerRequiredMixin, ListView):
     model = Invoice
     template_name = 'invoicing/invoice_list.html'
     context_object_name = 'invoices'
     ordering = ['-created_at']
 
 
-class ViewInvoiceCreate(CreateView):
+class ViewInvoiceCreate(ManagerRequiredMixin, CreateView):
     model = Invoice
     form_class = InvoiceForm
     template_name = 'invoicing/invoice_form.html'
@@ -91,7 +92,7 @@ class ViewInvoiceCreate(CreateView):
         return reverse('invoicing:invoice_detail', kwargs={'pk': self.object.pk})
 
 
-class ViewInvoiceDetail(DetailView):
+class ViewInvoiceDetail(ManagerRequiredMixin, DetailView):
     model = Invoice
     template_name = 'invoicing/invoice_detail.html'
     context_object_name = 'invoice'
@@ -111,7 +112,7 @@ class ViewInvoiceDetail(DetailView):
         return context
 
 
-class ViewInvoiceMarkPaid(View):
+class ViewInvoiceMarkPaid(ManagerRequiredMixin, View):
 
     def post(self, request, pk):
         invoice = get_object_or_404(Invoice, pk=pk)

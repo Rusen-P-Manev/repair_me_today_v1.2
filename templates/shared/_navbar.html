@@ -7,33 +7,54 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto fs-5 align-items-center">
 
-        <li class="nav-item">
-          <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'garage:client_list' %}">Клиенти</a>
-        </li>
+        {% if user.is_authenticated %}
+            {% if request.user.groups.all or request.user.is_superuser %}
+                <li class="nav-item">
+                  <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'garage:client_list' %}">Клиенти</a>
+                </li>
+                <li class="nav-item">
+                  <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'garage:vehicle_list' %}">Автомобили</a>
+                </li>
+                <li class="nav-item">
+                  <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'repairs:job_list' %}">Ремонти</a>
+                </li>
+                <li class="nav-item">
+                  <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'invoicing:invoice_list' %}">Фактури</a>
+                </li>
+                <li class="nav-item dropdown ms-lg-2 mt-3 mt-lg-0">
+                  <a class="btn btn-warning text-dark fw-bold dropdown-toggle shadow-sm" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Меню</a>
+                  <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end mt-2" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="{% url 'public_client_info' %}">Публична проверка</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'repairs:service_catalog_list' %}">Каталог Услуги</a></li>
+                    <li><a class="dropdown-item" href="{% url 'repairs:archive_list' %}">Архив (Платени)</a> </li>
+                  </ul>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                  <a class="nav-link fw-bold text-white me-3" href="{% url 'client_profile' %}">Моят Профил</a>
+                </li>
+            {% endif %}
 
-        <li class="nav-item">
-          <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'garage:vehicle_list' %}">Автомобили</a>
-        </li>
+            <li class="nav-item mt-3 mt-lg-0 ms-lg-2">
+              <form method="post" action="{% url 'logout' %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-light fw-bold">Изход</button>
+              </form>
+            </li>
 
-        <li class="nav-item">
-          <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'repairs:job_list' %}">Ремонти</a>
-        </li>
+        {% else %}
+            <li class="nav-item">
+              <a class="nav-link me-2" href="{% url 'public_client_info' %}">Проверка на ремонт</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-primary fw-bold mx-1 mt-2 mt-lg-0" href="{% url 'login' %}">Вход</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-success fw-bold mx-1 mt-2 mt-lg-0" href="{% url 'register' %}">Регистрация</a>
+            </li>
+        {% endif %}
 
-        <li class="nav-item">
-          <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'invoicing:invoice_list' %}">Фактури</a>
-        </li>
-
-        <li class="nav-item dropdown ms-lg-2 mt-3 mt-lg-0">
-          <a class="btn btn-warning text-dark fw-bold dropdown-toggle shadow-sm" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Меню
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end mt-2" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="{% url 'public_client_info' %}">Публична проверка</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{% url 'repairs:service_catalog_list' %}">Каталог Услуги</a></li>
-            <li><a class="dropdown-item" href="{% url 'repairs:archive_list' %}">Архив (Платени)</a> </li>
-          </ul>
-        </li>
       </ul>
     </div>
   </div>

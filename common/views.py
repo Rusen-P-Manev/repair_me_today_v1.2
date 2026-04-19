@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from repairs.models import RepairJob
 from garage.models import Vehicle, Client
+from accounts.mixins import MechanicRequiredMixin
 
 
-class ViewDashboard(TemplateView):
+class ViewDashboard(MechanicRequiredMixin, TemplateView):
     template_name = 'common/dashboard.html'
 
     def get_context_data(self, **kwargs):
