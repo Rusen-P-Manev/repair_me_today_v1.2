@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, api_views
 
 app_name = 'repairs'
 
@@ -28,4 +28,8 @@ urlpatterns = [
 # archives
     path('archive/', views.ViewRepairArchiveList.as_view(), name='archive_list'),
     path('archive/<int:pk>/invoice/', views.ViewArchivedInvoiceDetail.as_view(), name='archived_invoice'),
+
+# api endpoints
+    path('api/services/', api_views.ServiceListCreateAPI.as_view(), name='api_services'),
+    path('api/status/<uuid:access_token>/', api_views.RepairStatusAPI.as_view(), name='api_repair_status'),
 ]
