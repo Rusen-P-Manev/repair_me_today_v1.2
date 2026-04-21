@@ -46,7 +46,7 @@ class ViewRepairJobCreate(MechanicRequiredMixin, CreateView):
         return reverse('repairs:job_detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
-        messages.success(self.request, "Работният картон беше отворен успешно!")
+        messages.success(self.request, "Работната карта беше отворена успешно!")
         return super().form_valid(form)
 
 
@@ -69,7 +69,7 @@ class ViewRepairJobDelete(ManagerRequiredMixin, DeleteView):
     success_url = reverse_lazy('repairs:job_list')
 
     def form_valid(self, form):
-        messages.warning(self.request, "Работният картон беше изтрит завинаги.")
+        messages.warning(self.request, "Работната карта беше изтрита успешно.")
         return super().form_valid(form)
 
 
@@ -252,7 +252,7 @@ class ViewRepairArchiveList(ManagerRequiredMixin, ListView):
     model = RepairArchive
     template_name = 'repairs/archive_list.html'
     context_object_name = 'archives'
-    ordering = ['-id']
+    ordering = ['-created_at']
     paginate_by = 10
 
 

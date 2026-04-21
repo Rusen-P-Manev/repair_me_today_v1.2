@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Създаден на')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Последна промяна')),
-                ('original_job_id', models.IntegerField(verbose_name='ID на оригиналния картон')),
+                ('original_job_id', models.IntegerField(verbose_name='ID на оригинална карта')),
                 ('vehicle_registration_number', models.CharField(max_length=20, verbose_name='Рег. номер на автомобила')),
                 ('archive_data', models.JSONField(verbose_name='JSON Архив на ремонта')),
             ],
@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(help_text='Напр. Накладки, Маслен филтър и др.', max_length=255, verbose_name='Описание на частта/частите')),
                 ('invoice_number', models.CharField(blank=True, max_length=50, null=True, verbose_name='Номер на доставна фактура')),
                 ('price', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, validators=[django.core.validators.MinValueValidator(0.01)], verbose_name='Цена на частта')),
-                ('repair_job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='parts', to='repairs.repairjob', verbose_name='Работен картон')),
+                ('repair_job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='parts', to='repairs.repairjob', verbose_name='Работна карта')),
             ],
             options={
                 'verbose_name': 'Авточаст към ремонт',
@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('quantity', models.DecimalField(decimal_places=2, default=1.0, max_digits=5, validators=[django.core.validators.MinValueValidator(0.01)], verbose_name='Количество / Часове')),
-                ('repair_job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='repairs.repairjob', verbose_name='Работен картон')),
+                ('repair_job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='repairs.repairjob', verbose_name='Работна карта')),
                 ('service', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='repairs.service', verbose_name='Избрана услуга')),
             ],
             options={

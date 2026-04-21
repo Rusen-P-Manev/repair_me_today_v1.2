@@ -127,8 +127,6 @@ class ViewInvoiceMarkPaid(ManagerRequiredMixin, View):
             invoice.is_paid = True
             invoice.save()
 
-            create_repair_archive(invoice.repair_job)
-
             messages.success(request, "Фактурата е платена! Данните са архивирани.")
         else:
             messages.warning(request, "Тази фактура вече е платена.")

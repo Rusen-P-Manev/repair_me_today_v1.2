@@ -59,7 +59,7 @@ class Invoice(ReadOnlyFieldsModelMixin, TimeStampModel):
         "repairs.RepairJob",
         on_delete=models.CASCADE,
         related_name="invoice",
-        verbose_name="Работен картон",
+        verbose_name="Работна карта",
     )
 
     invoice_number = models.CharField(
@@ -82,6 +82,8 @@ class Invoice(ReadOnlyFieldsModelMixin, TimeStampModel):
     tax_id = models.CharField(
         max_length=20,
         validators=[validate_tax_id],
+        blank=True,
+        null=True,
         verbose_name="ЕИК/ЕГН",
     )
 
@@ -119,13 +121,15 @@ class Invoice(ReadOnlyFieldsModelMixin, TimeStampModel):
         return f"INV-{max_num + 1:06d}"
 
     def save(self, *args, **kwargs):
-        if not self.pk:
+        is_new = self.pk is None
+        if is_new:
             self.invoice_number = self._generate_invoice_number()
+
         super().save(*args, **kwargs)
 
-    class Meta:
-        verbose_name = "Фактура"
-        verbose_name_plural = "Фактури"
+        if self.is_paid:
+            from common.utils import create_repair_archive
+            from repairs.models import RepairArchive
 
-    def __str__(self):
-        return f"Фактура №{self.invoice_number} - {self.client_name}"
+            if not RepairArchive.objects.filter(original_job_id=self.repair_job.id).exists():
+                create_repair_archive(self.repair_job)

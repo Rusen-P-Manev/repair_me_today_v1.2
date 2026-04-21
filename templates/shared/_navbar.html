@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
   <div class="container">
     <a class="navbar-brand fs-3 fw-bold" href="{% url 'dashboard' %}">RepairMeToday</a>
@@ -18,16 +19,23 @@
                 <li class="nav-item">
                   <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'repairs:job_list' %}">Ремонти</a>
                 </li>
+                
+                {% if request.user|has_group:"Managers" %}
                 <li class="nav-item">
                   <a class="btn btn-warning text-dark fw-bold mx-1 mt-2 mt-lg-0 shadow-sm" href="{% url 'invoicing:invoice_list' %}">Фактури</a>
                 </li>
+                {% endif %}
+
                 <li class="nav-item dropdown ms-lg-2 mt-3 mt-lg-0">
                   <a class="btn btn-warning text-dark fw-bold dropdown-toggle shadow-sm" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Меню</a>
                   <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end mt-2" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="{% url 'public_client_info' %}">Публична проверка</a></li>
+                    
+                    {% if request.user|has_group:"Managers" %}
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="{% url 'repairs:service_catalog_list' %}">Каталог Услуги</a></li>
                     <li><a class="dropdown-item" href="{% url 'repairs:archive_list' %}">Архив (Платени)</a> </li>
+                    {% endif %}
                   </ul>
                 </li>
             {% else %}
@@ -59,4 +67,3 @@
     </div>
   </div>
 </nav>
-

@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
+
 {% block title %}Работни карти - RepairMeToday{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -37,7 +39,10 @@
                         <td class="text-end">
                             <a href="{% url 'repairs:job_detail' job.pk %}" class="btn btn-primary fw-bold me-1">Отвори</a>
                             <a href="{% url 'repairs:job_update' job.pk %}" class="btn btn-success fw-bold me-1">Редактирай</a>
+
+                            {% if request.user|has_group:"Managers" %}
                             <a href="{% url 'repairs:job_delete' job.pk %}" class="btn btn-danger fw-bold">Изтрий</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}

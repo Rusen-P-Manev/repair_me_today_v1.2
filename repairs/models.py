@@ -101,7 +101,7 @@ class RepairService(models.Model):
     repair_job = models.ForeignKey(
         "RepairJob",
         on_delete=models.CASCADE,
-        verbose_name="Работен картон",
+        verbose_name="Работна карта",
     )
 
     service = models.ForeignKey(
@@ -130,7 +130,7 @@ class PartOrder(models.Model):
         "RepairJob",
         on_delete=models.CASCADE,
         related_name="parts",
-        verbose_name="Работен картон",
+        verbose_name="Работна карта",
     )
 
     status = models.CharField(
@@ -172,7 +172,7 @@ class PartOrder(models.Model):
 
 class RepairArchive(ReadOnlyModelMixin, TimeStampModel):  # Напълно заключен + време
     original_job_id = models.IntegerField(
-        verbose_name="ID на оригиналния картон"
+        verbose_name="ID на оригинала Работна карта"
     )
 
     vehicle_registration_number = models.CharField(
@@ -189,4 +189,4 @@ class RepairArchive(ReadOnlyModelMixin, TimeStampModel):  # Напълно за�
         verbose_name_plural = "Архивирани ремонти"
 
     def __str__(self):
-        return f"Архивиран Картон #{self.original_job_id} - {self.vehicle_registration_number}"
+        return f"Архивирана Работна карта #{self.original_job_id} - {self.vehicle_registration_number}"

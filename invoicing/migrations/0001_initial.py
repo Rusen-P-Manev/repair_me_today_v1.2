@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 ('tax_id', models.CharField(max_length=20, validators=[common.validators.validate_tax_id], verbose_name='ЕИК/ЕГН')),
                 ('total_amount', models.DecimalField(decimal_places=2, default=0.0, max_digits=10, verbose_name='Крайна сума')),
                 ('is_paid', models.BooleanField(default=False, verbose_name='Платена')),
-                ('repair_job', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='invoice', to='repairs.repairjob', verbose_name='Работен картон')),
+                ('repair_job', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='invoice', to='repairs.repairjob', verbose_name='Работна карта')),
             ],
             options={
                 'verbose_name': 'Фактура',

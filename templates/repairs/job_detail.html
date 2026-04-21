@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
+
 {% block title %}Работна карта {{ job.id }} - RepairMeToday{% endblock %}
 
 {% block content %}
@@ -60,14 +62,20 @@
                     <p class="mb-0 fs-5">{{ job.problem_description|linebreaksbr }}</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    {% if not job.invoice %}
-                        {% if is_ready_for_invoicing %}
-                            <a href="{% url 'invoicing:invoice_create' job.id %}" class="btn btn-warning kiosk-btn fw-bold fs-4 text-dark w-100">Издай Фактура</a>
+                    {% if request.user|has_group:"Managers" %}
+                        {% if not job.invoice %}
+                            {% if is_ready_for_invoicing %}
+                                <a href="{% url 'invoicing:invoice_create' job.id %}" class="btn btn-warning kiosk-btn fw-bold fs-4 text-dark w-100">Издай Фактура</a>
+                            {% else %}
+                                <button class="btn btn-secondary kiosk-btn fw-bold fs-5 disabled w-100" style="opacity: 0.6;">Издай Фактура (Заключено)</button>
+                            {% endif %}
                         {% else %}
-                            <button class="btn btn-secondary kiosk-btn fw-bold fs-5 disabled w-100" style="opacity: 0.6;">Издай Фактура (Заключено)</button>
+                            <a href="{% url 'invoicing:invoice_detail' job.invoice.id %}" class="btn btn-info text-white kiosk-btn fw-bold fs-4 w-100">Фактура {{ job.invoice.invoice_number }}</a>
                         {% endif %}
                     {% else %}
-                        <a href="{% url 'invoicing:invoice_detail' job.invoice.id %}" class="btn btn-info text-white kiosk-btn fw-bold fs-4 w-100">Фактура {{ job.invoice.invoice_number }}</a>
+                        {% if job.invoice %}
+                            <div class="alert alert-success fs-5 fw-bold mb-0 text-center">Ремонтът е фактуриран</div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
