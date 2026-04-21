@@ -6,6 +6,12 @@
         <div class="d-flex justify-content-between mb-3 d-print-none">
             <a href="{% url 'invoicing:invoice_list' %}" class="btn btn-light text-dark border fw-bold px-4">Върни към списъка</a>
             <div>
+                {% if invoice.pdf_document %}
+                    <a href="{{ invoice.pdf_document.url }}" class="btn btn-danger fw-bold px-4 me-2" target="_blank" download>Изтегли PDF</a>
+                {% else %}
+                    <button class="btn btn-secondary fw-bold px-4 me-2" disabled>PDF се генерира...</button>
+                {% endif %}
+
                 {% if not invoice.is_paid %}
                 <form method="POST" action="{% url 'invoicing:invoice_mark_paid' invoice.pk %}" class="d-inline">
                     {% csrf_token %}

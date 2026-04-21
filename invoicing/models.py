@@ -97,6 +97,13 @@ class Invoice(ReadOnlyFieldsModelMixin, TimeStampModel):
         verbose_name="Платена",
     )
 
+    pdf_document = models.FileField(
+        upload_to='invoices_pdfs/',
+        blank=True,
+        null=True,
+        verbose_name="PDF Документ"
+    )
+
     @classmethod
     def _generate_invoice_number(cls):
         invoices = cls.objects.filter(invoice_number__startswith='INV-')
@@ -115,7 +122,6 @@ class Invoice(ReadOnlyFieldsModelMixin, TimeStampModel):
         if not self.pk:
             self.invoice_number = self._generate_invoice_number()
         super().save(*args, **kwargs)
-
 
     class Meta:
         verbose_name = "Фактура"

@@ -22,6 +22,7 @@ class ViewRepairJobList(MechanicRequiredMixin, ListView):
     template_name = 'repairs/job_list.html'
     context_object_name = 'jobs'
     ordering = ['-created_at']
+    paginate_by = 10
 
 
 class ViewRepairJobDetail(MechanicRequiredMixin, DetailView):
@@ -207,6 +208,7 @@ class ViewServiceCatalogList(ManagerRequiredMixin, ListView):
     template_name = 'repairs/catalog_list.html'
     context_object_name = 'services'
     ordering = ['name']
+    paginate_by = 10
 
 
 class ViewServiceCatalogCreate(ManagerRequiredMixin, CreateView):
@@ -251,6 +253,7 @@ class ViewRepairArchiveList(ManagerRequiredMixin, ListView):
     template_name = 'repairs/archive_list.html'
     context_object_name = 'archives'
     ordering = ['-id']
+    paginate_by = 10
 
 
 class ViewArchivedInvoiceDetail(ManagerRequiredMixin, DetailView):

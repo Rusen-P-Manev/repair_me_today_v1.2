@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, DetailView
 from common.utils import create_repair_archive, calculate_vat, check_if_ready_for_invoicing
 from accounts.mixins import ManagerRequiredMixin
+from .tasks import generate_invoice_pdf
 
 
 class ViewInvoiceList(ManagerRequiredMixin, ListView):
@@ -17,6 +18,7 @@ class ViewInvoiceList(ManagerRequiredMixin, ListView):
     template_name = 'invoicing/invoice_list.html'
     context_object_name = 'invoices'
     ordering = ['-created_at']
+    paginate_by = 10
 
 
 class ViewInvoiceCreate(ManagerRequiredMixin, CreateView):
@@ -85,8 +87,12 @@ class ViewInvoiceCreate(ManagerRequiredMixin, CreateView):
         form.instance.tax_id = initial_data['tax_id']
         form.instance.is_corporate = initial_data['is_corporate']
 
+        response = super().form_valid(form)
+
+        generate_invoice_pdf.delay(self.object.id)
+
         messages.success(self.request, "Фактурата беше генерирана успешно!")
-        return super().form_valid(form)
+        return response
 
     def get_success_url(self):
         return reverse('invoicing:invoice_detail', kwargs={'pk': self.object.pk})

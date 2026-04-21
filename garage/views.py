@@ -13,6 +13,7 @@ class ViewClientList(MechanicRequiredMixin, ListView):
     template_name = 'garage/client_list.html'
     context_object_name = 'clients'
     ordering = ['-id']
+    paginate_by = 10
 
 
 class ViewClientCreate(MechanicRequiredMixin, CreateView):
@@ -59,6 +60,7 @@ class ViewVehicleList(MechanicRequiredMixin, ListView):
     template_name = 'garage/vehicle_list.html'
     context_object_name = 'vehicles'
     ordering = ['-id']
+    paginate_by = 10
 
 
 class ViewVehicleCreate(MechanicRequiredMixin, CreateView):

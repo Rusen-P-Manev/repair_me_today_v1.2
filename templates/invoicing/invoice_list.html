@@ -35,6 +35,9 @@
                         </td>
                         <td class="text-muted">{{ invoice.created_at|date:"d.m.Y" }}</td>
                         <td class="text-end">
+                            {% if invoice.pdf_document %}
+                                <a href="{{ invoice.pdf_document.url }}" class="btn btn-outline-danger fw-bold me-1" target="_blank" title="Изтегли PDF">PDF</a>
+                            {% endif %}
                             <a href="{% url 'invoicing:invoice_detail' invoice.pk %}" class="btn btn-primary fw-bold">Отвори</a>
                         </td>
                     </tr>
@@ -46,6 +49,7 @@
                 </tbody>
             </table>
         </div>
+        {% include 'shared/_pagination.html' %}
     </div>
 </div>
 {% endblock %}
