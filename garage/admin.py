@@ -10,6 +10,7 @@ class ClientAdmin(admin.ModelAdmin):
         "is_corporate",
         "company_name",
         "phone_number",
+        "user",
     )
 
     list_filter = (

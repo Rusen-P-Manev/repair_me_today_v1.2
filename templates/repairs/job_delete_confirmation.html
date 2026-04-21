@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
-{% block title %}Изтриване на картон{% endblock %}
+{% block title %}Изтриване на Работна карта{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6 mt-5">
         <div class="card kiosk-card text-center p-5 border-danger border-2">
-            <h2 class="fw-bold text-dark">Изтриване на картон #{{ object.id }}</h2>
+            <h2 class="fw-bold text-dark">Изтриване на Работна карта #{{ object.id }}</h2>
 
             <p class="fs-4 mt-3">
                 Автомобил: <span class="badge border border-secondary text-secondary bg-transparent fs-5">{{ object.vehicle.vehicle_registration_number }}</span>
             </p>
 
             <div class="alert alert-warning fs-5">
-                Това действие ще изтрие картона и всички поръчани части към него!
+                Това действие ще изтрие работната карта и всички поръчани части към него!
             </div>
 
             <form method="POST" class="mt-4 d-flex justify-content-between gap-3">

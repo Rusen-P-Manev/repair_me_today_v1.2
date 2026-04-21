@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
-{% block title %}Добавяне на част - RepairMeToday{% endblock %}
+{% block title %}{% if object %}Редактиране{% else %}Добавяне{% endif %} на част - RepairMeToday{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card kiosk-card p-4 border-primary border-top border-4">
-            <h2 class="mb-4 text-center fw-bold text-dark">Добавяне на част</h2>
-            <p class="text-center text-muted mb-4 fs-5">към Работна карта #{{ view.kwargs.job_id }}</p>
+
+            <h2 class="mb-4 text-center fw-bold text-dark">
+                {% if object %}Редактиране на част{% else %}Добавяне на част{% endif %}
+            </h2>
+            <p class="text-center text-muted mb-4 fs-5">
+                към Работна карта #{% if object %}{{ object.repair_job.id }}{% else %}{{ view.kwargs.job_id }}{% endif %}
+            </p>
 
             <form method="POST" novalidate>
                 {% csrf_token %}
@@ -21,14 +27,25 @@
                         </div>
                     {% endfor %}
                 </div>
+
                 <div class="d-flex justify-content-between mt-5">
-                    <a href="{% url 'repairs:job_detail' view.kwargs.job_id %}" class="btn btn-light text-dark border fw-bold px-4">Назад</a>
+
+                    {% if object %}
+                        <a href="{% url 'repairs:job_detail' object.repair_job.id %}" class="btn btn-light text-dark border fw-bold px-4">Назад</a>
+                    {% else %}
+                        <a href="{% url 'repairs:job_detail' view.kwargs.job_id %}" class="btn btn-light text-dark border fw-bold px-4">Назад</a>
+                    {% endif %}
+
                     <div class="d-flex gap-2">
-                        <button type="submit" name="save_and_add_another" class="btn btn-primary fw-bold px-4">Запази и добави друга</button>
+                        {% if not object %}
+                            <button type="submit" name="save_and_add_another" class="btn btn-primary fw-bold px-4">Запази и добави друга</button>
+                        {% endif %}
                         <button type="submit" class="btn btn-success fw-bold px-5">Запази</button>
                     </div>
+
                 </div>
             </form>
+
         </div>
     </div>
 </div>

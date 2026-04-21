@@ -29,9 +29,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # DEBUG = False
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = [
-#    '127.0.0.1', 'localhost',
-]
+ALLOWED_HOSTS = os.getenv(
+    'ALLOWED_HOSTS',
+    'localhost,127.0.0.1,0.0.0.0'
+).split(',')
 
 
 # Application definition
@@ -41,6 +42,7 @@ PROJECT_APPS = [
     'invoicing',
     'repairs',
     'common',
+    'accounts',
 ]
 
 INSTALLED_APPS = [
@@ -50,6 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+
 ] + PROJECT_APPS
 
 MIDDLEWARE = [
@@ -137,3 +141,12 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
+AUTH_USER_MODEL = 'accounts.CarServiceUsers'
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'login'
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://redis:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE

@@ -34,7 +34,10 @@
                         <td>{{ client.phone_number|format_phone }}</td>
                         <td class="text-end">
                             <a href="{% url 'garage:client_update' client.pk %}" class="btn btn-success fw-bold me-2">Редактирай</a>
+
+                            {% if request.user|has_group:"Managers" %}
                             <a href="{% url 'garage:client_delete' client.pk %}" class="btn btn-danger fw-bold">Изтрий</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}
@@ -45,6 +48,7 @@
                 </tbody>
             </table>
         </div>
+        {% include 'shared/_pagination.html' %}
     </div>
 </div>
 {% endblock %}

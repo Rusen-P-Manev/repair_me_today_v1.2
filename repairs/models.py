@@ -1,6 +1,8 @@
 import uuid
 from django.core.validators import MinValueValidator
 from django.db import models
+from common.models import TimeStampModel
+from common.mixins import ReadOnlyModelMixin
 
 
 class PartOrderStatusChoices(models.TextChoices):
@@ -36,7 +38,7 @@ class Service(models.Model):
         return f"{self.name} - {self.price} €."
 
 
-class RepairJob(models.Model):
+class RepairJob(TimeStampModel):
     vehicle = models.ForeignKey(
         "garage.Vehicle",
         on_delete=models.CASCADE,
@@ -87,16 +89,6 @@ class RepairJob(models.Model):
         verbose_name="Код за проследяване",
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Създаден на",
-    )
-
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name="Последна промяна",
-    )
-
     class Meta:
         verbose_name = "Работна карта"
         verbose_name_plural = "Работни карти"
@@ -109,7 +101,7 @@ class RepairService(models.Model):
     repair_job = models.ForeignKey(
         "RepairJob",
         on_delete=models.CASCADE,
-        verbose_name="Работен картон",
+        verbose_name="Работна карта",
     )
 
     service = models.ForeignKey(
@@ -138,7 +130,7 @@ class PartOrder(models.Model):
         "RepairJob",
         on_delete=models.CASCADE,
         related_name="parts",
-        verbose_name="Работен картон",
+        verbose_name="Работна карта",
     )
 
     status = models.CharField(
@@ -178,10 +170,9 @@ class PartOrder(models.Model):
         return f"{self.description} - {self.get_status_display()}"
 
 
-class RepairArchive(models.Model):
-
+class RepairArchive(ReadOnlyModelMixin, TimeStampModel):
     original_job_id = models.IntegerField(
-        verbose_name="ID на оригиналния картон"
+        verbose_name="ID на оригинала Работна карта"
     )
 
     vehicle_registration_number = models.CharField(
@@ -193,14 +184,9 @@ class RepairArchive(models.Model):
         verbose_name="JSON Архив на ремонта"
     )
 
-    archived_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Дата на архивиране"
-    )
-
     class Meta:
         verbose_name = "Архивиран ремонт"
         verbose_name_plural = "Архивирани ремонти"
 
     def __str__(self):
-        return f"Архивиран Картон #{self.original_job_id} - {self.vehicle_registration_number}"
+        return f"Архивирана Работна карта #{self.original_job_id} - {self.vehicle_registration_number}"

@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from common.validators import (
     validate_tax_id, validate_phone_number, validate_vin,
     custom_email_validator, validate_year, validate_name_letters_only,
@@ -6,6 +7,16 @@ from common.validators import (
 
 
 class Client(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="client_profile",
+        verbose_name="Потребителски акаунт"
+    )
+
+
     is_corporate = models.BooleanField(
         default=False,
         verbose_name="Юридическо лице",

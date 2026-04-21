@@ -1,3 +1,14 @@
 from django.db import models
 
-# Create your models here.
+class TimeStampModel(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Създаден на"
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Последна промяна"
+    )
+
+    class Meta:
+        abstract = True

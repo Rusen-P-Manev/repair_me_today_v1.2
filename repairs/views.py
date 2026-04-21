@@ -4,7 +4,8 @@ from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.views import View
 from invoicing.models import ShopProfile
-from common.utils import calculate_vat
+from common.utils import calculate_vat, check_if_ready_for_invoicing
+from accounts.mixins import ManagerRequiredMixin, MechanicRequiredMixin
 from .models import (
     RepairJob, PartOrder, Service,
     RepairArchive, RepairService
@@ -14,21 +15,29 @@ from .forms import (
     PublicClientInfoForm, ServiceCatalogForm, RepairServiceForm
 )
 
- # repairs -->
-class ViewRepairJobList(ListView):
+
+# repairs -->
+class ViewRepairJobList(MechanicRequiredMixin, ListView):
     model = RepairJob
     template_name = 'repairs/job_list.html'
     context_object_name = 'jobs'
     ordering = ['-created_at']
+    paginate_by = 10
 
 
-class ViewRepairJobDetail(DetailView):
+class ViewRepairJobDetail(MechanicRequiredMixin, DetailView):
     model = RepairJob
     template_name = 'repairs/job_detail.html'
     context_object_name = 'job'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_ready_for_invoicing'] = check_if_ready_for_invoicing(self.object)
+        context['status_choices'] = RepairJob._meta.get_field('status').choices
+        return context
 
-class ViewRepairJobCreate(CreateView):
+
+class ViewRepairJobCreate(MechanicRequiredMixin, CreateView):
     model = RepairJob
     form_class = RepairJobCreateForm
     template_name = 'repairs/job_form.html'
@@ -37,11 +46,11 @@ class ViewRepairJobCreate(CreateView):
         return reverse('repairs:job_detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
-        messages.success(self.request, "Работният картон беше отворен успешно!")
+        messages.success(self.request, "Работната карта беше отворена успешно!")
         return super().form_valid(form)
 
 
-class ViewRepairJobUpdate(UpdateView):
+class ViewRepairJobUpdate(MechanicRequiredMixin, UpdateView):
     model = RepairJob
     form_class = RepairJobUpdateForm
     template_name = 'repairs/job_form.html'
@@ -54,18 +63,18 @@ class ViewRepairJobUpdate(UpdateView):
         return super().form_valid(form)
 
 
-class ViewRepairJobDelete(DeleteView):
+class ViewRepairJobDelete(ManagerRequiredMixin, DeleteView):
     model = RepairJob
     template_name = 'repairs/job_delete_confirmation.html'
     success_url = reverse_lazy('repairs:job_list')
 
     def form_valid(self, form):
-        messages.warning(self.request, "Работният картон беше изтрит завинаги.")
+        messages.warning(self.request, "Работната карта беше изтрита успешно.")
         return super().form_valid(form)
 
 
 # parts -->
-class ViewPartOrderCreate(CreateView):
+class ViewPartOrderCreate(MechanicRequiredMixin, CreateView):
     model = PartOrder
     form_class = PartOrderForm
     template_name = 'repairs/add_part_form.html'
@@ -88,7 +97,7 @@ class ViewPartOrderCreate(CreateView):
         return reverse('repairs:job_detail', kwargs={'pk': self.kwargs.get('job_id')})
 
 
-class ViewPartOrderDelete(DeleteView):
+class ViewPartOrderDelete(MechanicRequiredMixin, DeleteView):
     model = PartOrder
     template_name = 'repairs/part_delete_confirmation.html'
 
@@ -100,7 +109,38 @@ class ViewPartOrderDelete(DeleteView):
         return super().form_valid(form)
 
 
-# public client info --?
+class ViewPartOrderUpdate(MechanicRequiredMixin, UpdateView):
+    model = PartOrder
+    form_class = PartOrderForm
+    template_name = 'repairs/add_part_form.html'
+
+    def form_valid(self, form):
+        messages.success(self.request, "Данните са обновени успешно!")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('repairs:job_detail', kwargs={'pk': self.object.repair_job.pk})
+
+
+class ViewRepairJobStatusUpdate(MechanicRequiredMixin, View):
+
+    def post(self, request, pk):
+        job = get_object_or_404(RepairJob, pk=pk)
+
+        if hasattr(job, 'invoice'):
+            messages.error(request, "Не можете да променяте статуса на вече фактуриран ремонт!")
+            return redirect('repairs:job_detail', pk=job.pk)
+
+        new_status = request.POST.get('status')
+        if new_status:
+            job.status = new_status
+            job.save()
+            messages.success(request, f"Статусът беше успешно променен на: {job.get_status_display()}")
+
+        return redirect('repairs:job_detail', pk=job.pk)
+
+
+# public client info -->
 class ViewClientInfo(View):
     template_name = 'repairs/public_client_info.html'
 
@@ -126,8 +166,9 @@ class ViewClientInfo(View):
 
         return render(request, self.template_name, {'form': form, 'job': job})
 
-# repairs --->
-class ViewRepairServiceCreate(CreateView):
+
+# repair services --->
+class ViewRepairServiceCreate(MechanicRequiredMixin, CreateView):
     model = RepairService
     form_class = RepairServiceForm
     template_name = 'repairs/add_service_form.html'
@@ -149,7 +190,7 @@ class ViewRepairServiceCreate(CreateView):
         return reverse('repairs:job_detail', kwargs={'pk': self.kwargs.get('job_id')})
 
 
-class ViewRepairServiceDelete(DeleteView):
+class ViewRepairServiceDelete(MechanicRequiredMixin, DeleteView):
     model = RepairService
     template_name = 'repairs/service_delete_confirmation.html'
 
@@ -162,14 +203,15 @@ class ViewRepairServiceDelete(DeleteView):
 
 
 # catalog views -->
-class ViewServiceCatalogList(ListView):
+class ViewServiceCatalogList(ManagerRequiredMixin, ListView):
     model = Service
     template_name = 'repairs/catalog_list.html'
     context_object_name = 'services'
     ordering = ['name']
+    paginate_by = 10
 
 
-class ViewServiceCatalogCreate(CreateView):
+class ViewServiceCatalogCreate(ManagerRequiredMixin, CreateView):
     model = Service
     form_class = ServiceCatalogForm
     template_name = 'repairs/catalog_form.html'
@@ -184,7 +226,8 @@ class ViewServiceCatalogCreate(CreateView):
 
         return response
 
-class ViewServiceCatalogUpdate(UpdateView):
+
+class ViewServiceCatalogUpdate(ManagerRequiredMixin, UpdateView):
     model = Service
     form_class = ServiceCatalogForm
     template_name = 'repairs/catalog_form.html'
@@ -194,7 +237,8 @@ class ViewServiceCatalogUpdate(UpdateView):
         messages.success(self.request, "Услугата беше обновена успешно!")
         return super().form_valid(form)
 
-class ViewServiceCatalogDelete(DeleteView):
+
+class ViewServiceCatalogDelete(ManagerRequiredMixin, DeleteView):
     model = Service
     template_name = 'repairs/catalog_delete_confirmation.html'
     success_url = reverse_lazy('repairs:service_catalog_list')
@@ -204,14 +248,15 @@ class ViewServiceCatalogDelete(DeleteView):
         return super().form_valid(form)
 
 
-class ViewRepairArchiveList(ListView):
+class ViewRepairArchiveList(ManagerRequiredMixin, ListView):
     model = RepairArchive
     template_name = 'repairs/archive_list.html'
     context_object_name = 'archives'
-    ordering = ['-id']
+    ordering = ['-created_at']
+    paginate_by = 10
 
 
-class ViewArchivedInvoiceDetail(DetailView):
+class ViewArchivedInvoiceDetail(ManagerRequiredMixin, DetailView):
     model = RepairArchive
     template_name = 'repairs/archived_invoice_detail.html'
     context_object_name = 'archive'

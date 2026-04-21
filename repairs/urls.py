@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, api_views
 
 app_name = 'repairs'
 
@@ -10,15 +10,12 @@ urlpatterns = [
     path('jobs/<int:pk>/', views.ViewRepairJobDetail.as_view(), name='job_detail'),
     path('jobs/<int:pk>/edit/', views.ViewRepairJobUpdate.as_view(), name='job_update'),
     path('jobs/<int:pk>/delete/', views.ViewRepairJobDelete.as_view(), name='job_delete'),
+    path('jobs/<int:pk>/update-status/', views.ViewRepairJobStatusUpdate.as_view(), name='job_status_update'),
 
 # parts
     path('jobs/<int:job_id>/parts/add/', views.ViewPartOrderCreate.as_view(), name='part_create'),
     path('parts/<int:pk>/delete/', views.ViewPartOrderDelete.as_view(), name='part_delete'),
-
-# parts and services
-    path('jobs/<int:job_id>/parts/add/', views.ViewPartOrderCreate.as_view(), name='part_create'),
-    path('parts/<int:pk>/delete/', views.ViewPartOrderDelete.as_view(), name='part_delete'),
-
+    path('parts/<int:pk>/update/', views.ViewPartOrderUpdate.as_view(), name='part_update'),
     path('jobs/<int:job_id>/services/add/', views.ViewRepairServiceCreate.as_view(), name='service_create'),
     path('services/<int:pk>/delete/', views.ViewRepairServiceDelete.as_view(), name='service_delete'),
 
@@ -31,4 +28,8 @@ urlpatterns = [
 # archives
     path('archive/', views.ViewRepairArchiveList.as_view(), name='archive_list'),
     path('archive/<int:pk>/invoice/', views.ViewArchivedInvoiceDetail.as_view(), name='archived_invoice'),
+
+# api endpoints
+    path('api/services/', api_views.ServiceListCreateAPI.as_view(), name='api_services'),
+    path('api/status/<uuid:access_token>/', api_views.RepairStatusAPI.as_view(), name='api_repair_status'),
 ]

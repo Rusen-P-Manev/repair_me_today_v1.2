@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Моят Профил - RepairMeToday{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5 fw-bold text-secondary">Добре дошли, {{ user.first_name }}!</h1>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card kiosk-card p-4 h-100 border-top border-info border-4">
+            <h4 class="fw-bold mb-4">Моите данни</h4>
+            {% if client %}
+                <p class="fs-5 mb-2"><strong>Име:</strong> {{ client.first_name }} {{ client.last_name }}</p>
+                <p class="fs-5 mb-2"><strong>Телефон:</strong> {{ client.phone_number }}</p>
+                <p class="fs-5 mb-2"><strong>Имейл:</strong> {{ client.email }}</p>
+                {% if client.is_corporate %}
+                    <hr>
+                    <p class="fs-5 mb-2"><span class="badge bg-secondary">Юридическо лице</span></p>
+                    <p class="fs-5 mb-0"><strong>Фирма:</strong> {{ client.company_name }} (ЕИК: {{ client.tax_id }})</p>
+                {% endif %}
+            {% else %}
+                <p class="text-muted">Профилът Ви все още не е напълно конфигуриран.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card kiosk-card p-4 h-100 border-top border-primary border-4">
+            <h4 class="fw-bold mb-4">Текущи ремонти</h4>
+            {% if active_jobs %}
+                <div class="list-group">
+                    {% for job in active_jobs %}
+                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3 mb-2 rounded border shadow-sm">
+                        <div>
+                            <h5 class="mb-1 fw-bold text-dark">{{ job.vehicle.make }} {{ job.vehicle.model }}</h5>
+                            <p class="mb-1 text-muted">Рег. номер: <span class="badge border border-secondary text-secondary bg-transparent">{{ job.vehicle.vehicle_registration_number }}</span></p>
+                            <small>Приет на: {{ job.created_at|date:"d.m.Y" }}</small>
+                        </div>
+                        <div class="text-end">
+                            {% if job.status == 'received' %}
+                                <span class="badge bg-secondary fs-5">{{ job.get_status_display }}</span>
+                            {% elif job.status == 'in_progress' %}
+                                <span class="badge bg-primary fs-5">{{ job.get_status_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-light border fs-5 text-center py-4">
+                    В момента нямате автомобили в сервиза.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card kiosk-card p-4 border-top border-secondary border-4">
+    <h4 class="fw-bold mb-4">Моите автомобили</h4>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle fs-5">
+            <thead class="table-light">
+                <tr>
+                    <th>Рег. Номер</th>
+                    <th>Марка и Модел</th>
+                    <th>Година</th>
+                    <th>VIN Номер</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vehicle in vehicles %}
+                <tr>
+                    <td><span class="badge border border-secondary text-secondary bg-transparent fs-6">{{ vehicle.vehicle_registration_number }}</span></td>
+                    <td class="fw-semibold">{{ vehicle.make }} {{ vehicle.model }}</td>
+                    <td>{{ vehicle.year }}</td>
+                    <td class="text-muted">{{ vehicle.vin }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">Нямате регистрирани автомобили.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

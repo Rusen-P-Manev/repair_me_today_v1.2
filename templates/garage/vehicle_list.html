@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
+
 {% block title %}Списък Автомобили - RepairMeToday{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -29,7 +31,10 @@
                         <td><a href="{% url 'garage:client_update' vehicle.client.pk %}" class="text-decoration-none">{{ vehicle.client }}</a></td>
                         <td class="text-end">
                             <a href="{% url 'garage:vehicle_update' vehicle.pk %}" class="btn btn-success fw-bold me-2">Редактирай</a>
+
+                            {% if request.user|has_group:"Managers" %}
                             <a href="{% url 'garage:vehicle_delete' vehicle.pk %}" class="btn btn-danger fw-bold">Изтрий</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}
@@ -40,6 +45,7 @@
                 </tbody>
             </table>
         </div>
+        {% include 'shared/_pagination.html' %}
     </div>
 </div>
 {% endblock %}

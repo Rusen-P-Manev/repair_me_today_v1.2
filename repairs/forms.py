@@ -38,13 +38,17 @@ class RepairJobUpdateForm(BootstrapFormMixin, forms.ModelForm):
 
 
 # parst -->
-class PartOrderForm(BootstrapFormMixin, forms.ModelForm):
+
+class PartOrderForm(forms.ModelForm):
     class Meta:
         model = PartOrder
         fields = ['description', 'status', 'invoice_number', 'price']
         widgets = {
-            'status': forms.Select(attrs={'class': 'form-select form-select-lg'}),
-            'description': forms.TextInput(attrs={'placeholder': 'напр. Ангренажен ремък, Водна помпа...'}),
+            'description': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Напр. Накладки, Маслен филтър и др.'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'invoice_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }
 
     def clean(self):
@@ -52,9 +56,8 @@ class PartOrderForm(BootstrapFormMixin, forms.ModelForm):
         status = cleaned_data.get('status')
         price = cleaned_data.get('price')
 
-        if status == PartOrderStatusChoices.DELIVERED:
-            if price is None or price <= 0:
-                self.add_error('price', 'Моля, въведете валидна цена за доставената част.')
+        if status == PartOrderStatusChoices.DELIVERED and not price:
+            self.add_error('price', 'Моля, въведете цена!')
 
         return cleaned_data
 
