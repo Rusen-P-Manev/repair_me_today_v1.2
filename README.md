@@ -32,16 +32,21 @@
 Това е най-лесният начин за стартиране, тъй като Docker автоматично инсталира нужните системни библиотеки за WeasyPrint и конфигурира Redis и PostgreSQL базите.
 
 1. Клонирайте хранилището:
+    ```bash
     git clone https://github.com/Rusen-P-Manev/repair_me_today_v1.2.git
     cd repair_me_today_v1.2
 
-2. Създайте `.env` файл в главната директория (използвайте `.env.example` за шаблон):
+3. Създайте `.env` файл в главната директория (използвайте `.env.example` за шаблон):
+   ```bash
     cp .env.example .env
 
-3. Изградете и стартирайте контейнерите:
+5. Изградете и стартирайте контейнерите:
+   ```bash
     docker-compose up --build
 
-4. Проектът ще бъде достъпен на: http://localhost:8000
+7. Проектът ще бъде достъпен на:
+   ```bash
+   http://localhost:8000
 
 ---
 
@@ -49,15 +54,19 @@
 Ако решите да стартирате проекта ръчно, уверете се, че имате инсталиран **Redis** сървър, **PostgreSQL** и системните библиотеки за WeasyPrint (pango, libcairo, libffi).
 
 1. Инсталирайте зависимостите:
+```bash
     pip install -r requirements.txt
 
-2. Изпълнете миграциите:
+3. Изпълнете миграциите:
+```bash
     python manage.py migrate
 
-3. Стартирайте Celery worker (в отделен терминал):
+4. Стартирайте Celery worker (в отделен терминал):
+```bash
     celery -A config worker -l info
 
-4. Стартирайте сървъра:
+5. Стартирайте сървъра:
+```bash
     python manage.py runserver
 
 ---
@@ -99,9 +108,11 @@
 Проектът включва **20 автоматизирани теста**, покриващи потребителски валидации, модели и бизнес логика.
 
 Изпълнение чрез Docker:
+```bash
     docker-compose exec web python manage.py test
 
 Изпълнение локално:
+```bash
     python manage.py test
 
 ---
