@@ -32,7 +32,7 @@
 Това е най-лесният начин за стартиране, тъй като Docker автоматично инсталира нужните системни библиотеки за WeasyPrint и конфигурира Redis и PostgreSQL базите.
 
 1. Клонирайте хранилището:
-    git clone <твоя-github-линк>
+    git clone https://github.com/Rusen-P-Manev/repair_me_today_v1.2.git
     cd repair_me_today_v1.2
 
 2. Създайте `.env` файл в главната директория (използвайте `.env.example` за шаблон):
