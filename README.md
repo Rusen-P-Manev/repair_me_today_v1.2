@@ -54,19 +54,19 @@
 Ако решите да стартирате проекта ръчно, уверете се, че имате инсталиран **Redis** сървър, **PostgreSQL** и системните библиотеки за WeasyPrint (pango, libcairo, libffi).
 
 1. Инсталирайте зависимостите:
-```bash
+
     pip install -r requirements.txt
 
 3. Изпълнете миграциите:
-```bash
+
     python manage.py migrate
 
 4. Стартирайте Celery worker (в отделен терминал):
-```bash
+
     celery -A config worker -l info
 
 5. Стартирайте сървъра:
-```bash
+
     python manage.py runserver
 
 ---
