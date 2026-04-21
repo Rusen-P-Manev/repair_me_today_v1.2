@@ -38,7 +38,7 @@ class Service(models.Model):
         return f"{self.name} - {self.price} €."
 
 
-class RepairJob(TimeStampModel):  # Наследява времевите полета
+class RepairJob(TimeStampModel):
     vehicle = models.ForeignKey(
         "garage.Vehicle",
         on_delete=models.CASCADE,
@@ -170,7 +170,7 @@ class PartOrder(models.Model):
         return f"{self.description} - {self.get_status_display()}"
 
 
-class RepairArchive(ReadOnlyModelMixin, TimeStampModel):  # Напълно заключен + време
+class RepairArchive(ReadOnlyModelMixin, TimeStampModel):
     original_job_id = models.IntegerField(
         verbose_name="ID на оригинала Работна карта"
     )
