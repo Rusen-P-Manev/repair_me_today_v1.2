@@ -108,11 +108,11 @@
 Проектът включва **20 автоматизирани теста**, покриващи потребителски валидации, модели и бизнес логика.
 
 Изпълнение чрез Docker:
-```bash
+
     docker-compose exec web python manage.py test
 
 Изпълнение локално:
-```bash
+
     python manage.py test
 
 ---
